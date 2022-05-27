@@ -50,6 +50,20 @@ async function run(){
             const result = await productCollection.findOne({_id: ObjectId(id)});
             res.send(result);
         })
+
+        //update quantity 
+        app.put('/product/:id', async(req, res) => {
+            const id = req.params.id;
+            const quantity = req.body.avail_q;
+            const query = {_id: ObjectId(id)};
+            const updateDoc = {
+                $set: {
+                    avail_q: quantity
+                }
+            }
+            const result = await productCollection.updateOne(query, updateDoc);
+            res.send(result);
+        })
     }
 
     finally{
