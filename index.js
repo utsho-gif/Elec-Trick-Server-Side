@@ -69,6 +69,32 @@ async function run() {
       res.send({ result, token });
     });
 
+    //get all user
+    app.get('/user', verifyJWT,  async(req,res) => {
+      const user = await userCollection.find().toArray();
+      res.send(user);
+  })
+
+  //checking admin or not
+  app.get('/admin/:email',async(req,res) => {
+    const email = req.params.email;
+    const user = await userCollection.findOne({email: email});
+    const isAdmin = user.role === 'admin';
+    res.send({admin: isAdmin});
+})
+
+  //make an admin 
+  app.put('/user/admin/:email', verifyJWT, async (req, res) => {
+    const email = req.params.email;
+    const filter = { email: email };
+    const updateDoc = {
+     $set: {role: 'admin'},
+    };
+    const result = await userCollection.updateOne(filter, updateDoc);
+    res.send(result);
+
+})
+
     //load a single product
     app.get("/purchase/:id", async (req, res) => {
       const id = req.params.id;
@@ -89,6 +115,12 @@ async function run() {
       const result = await reviewCollection.insertOne(reviews);
       res.send(result);
     });
+
+    //get all review
+    app.get('/review', async(req,res) => {
+      const result = await reviewCollection.find().toArray();
+      res.send(result);
+    })
 
     //get individual order
     app.get("/order", verifyJWT, async (req, res) => {
