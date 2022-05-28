@@ -41,6 +41,7 @@ async function run() {
     const productCollection = client.db("elec-trick").collection("products");
     const userCollection = client.db("elec-trick").collection("users");
     const orderCollection = client.db("elec-trick").collection("orders");
+    const reviewCollection = client.db("elec-trick").collection("reviews");
 
     //get all services
     app.get("/product", async (req, res) => {
@@ -82,6 +83,13 @@ async function run() {
       res.send(result);
     });
 
+    //insert review
+    app.post("/review", async (req, res) => {
+      const reviews = req.body;
+      const result = await reviewCollection.insertOne(reviews);
+      res.send(result);
+    });
+
     //get individual order
     app.get("/order", verifyJWT, async (req, res) => {
       const email = req.query.email;
@@ -96,7 +104,13 @@ async function run() {
       }
     });
 
-    
+    //delete order
+    app.delete('/order/:id',verifyJWT, async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)};
+      const result = await orderCollection.deleteOne(query);
+      res.send(result);
+    })
   } finally {
   }
 }
